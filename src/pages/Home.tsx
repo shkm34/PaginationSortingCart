@@ -2,6 +2,7 @@
 import React from "react";
 import ProductList from "../components/ProductList";
 import { sampleProduct } from "../components/sampleData";
+import { fetchProducts } from '../api/products';
 
 // create a small list of sample products for UI testing
 const sampleProducts = Array.from({ length: 12 }).map((_, i) => ({
@@ -9,6 +10,8 @@ const sampleProducts = Array.from({ length: 12 }).map((_, i) => ({
   id: i + 1,
   title: `${sampleProduct.title} ${i + 1}`,
 }));
+
+fetchProducts({ limit: 6, skip: 0 }).then(console.log).catch(console.error);
 
 export default function Home() {
   return (
