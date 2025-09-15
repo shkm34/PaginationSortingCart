@@ -1,4 +1,4 @@
-import type { Product } from '../types/product'
+import type { Product } from '../types/types'
 
 const BASE = 'https://dummyjson.com'
 
@@ -7,16 +7,17 @@ export type FetchProductsParams = {
     skip?: number
     query?: string
     category?: string
+     signal?: AbortSignal;
 }
-export type ProductResponse = {
+export type ProductsResponse = {
   products: Product[]
   total: number
   skip: number
   limit: number
 }
 
-export async function fetchProducts(params:FetchProductsParams = {}): Promise<ProductResponse>{
-    const { limit = 12, skip = 0, query, category } = params
+export async function fetchProducts(params:FetchProductsParams = {}): Promise<ProductsResponse>{
+    const { limit = 12, skip = 0, query, category, signal } = params
 
     let url : URL
     if(query && query.trim().length > 0){
@@ -32,7 +33,7 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
     url.searchParams.set("limit", String(limit));
     url.searchParams.set("skip", String(skip));
 
-    const res = await fetch(url.toString())
+    const res = await fetch(url.toString(), { signal })
 
     if(!res.ok){
         throw new Error("Failed to fetch products")
