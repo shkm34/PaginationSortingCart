@@ -4,6 +4,7 @@ import { usePaginatedProducts } from "../hooks/usePaginatedProducts";
 import PaginationButton from "../components/PaginationButton";
 import LoadingBox from "../components/Boxes/LoadingBox";
 import ErrorBox from "../components/Boxes/ErrorBox";
+import SearchFilter from "../components/Filters/SearchFilter";
 
 export default function Home() {
 
@@ -22,6 +23,8 @@ export default function Home() {
         {typeof total === "number" ? <> of <strong>{total}</strong></> : null}
         {isFetching && <span className="ml-2 text-xs"> — updating…</span>}
       </div>
+
+      <SearchFilter />
 
       <ProductList products={products} onAdd={(p) => console.log("Add to cart:", p.id)} />
 

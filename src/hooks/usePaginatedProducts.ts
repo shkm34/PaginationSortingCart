@@ -1,7 +1,8 @@
 // src/hooks/usePaginatedProducts.ts
-import { useState, useMemo, useCallback} from "react";
+import { useEffect, useMemo, useCallback} from "react";
 import { useProducts } from "../hooks/useProducts";
 import { usePaginationWithUrl } from "../hooks/usePaginationWithUrl";
+import { useSearchFilterWithUrl } from "./useSearchFilterWithUrl";
 
 // Public options you can pass when calling the hook
 export type UsePaginatedProductsOpts = {
@@ -33,9 +34,12 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
     pushHistory,
   });
 
- // reset when filters change
-
-  const { data, isLoading, isError, error, isFetching, refetch } = useProducts(page, limit);
+ const { q } = useSearchFilterWithUrl();
+ 
+ const { data, isLoading, isError, error, isFetching, refetch } = useProducts({page, limit, q});
+ useEffect(() => {
+  setPage(1);
+}, [q, setPage]); // reset when filters change
 
   const total = data?.total;
   const totalPages = useMemo(
