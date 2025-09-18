@@ -22,8 +22,7 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
     let url : URL
     if(query && query.trim().length > 0){
         url = new URL(`${BASE}/products/search`)
-        url.searchParams.set("query", query.trim())
-        
+        url.searchParams.set("q", query.trim())
     }
     else if(category){
         url = new URL(`${BASE}/products`)
@@ -35,7 +34,6 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
     url.searchParams.set("skip", String(skip));
 
     const res = await fetch(url.toString(), { signal })
-    console.log("ho raha hai", url);
 
     if(!res.ok){
         throw new Error("Failed to fetch products")

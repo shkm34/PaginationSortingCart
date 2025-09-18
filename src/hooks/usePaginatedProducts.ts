@@ -34,12 +34,10 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
     pushHistory,
   });
 
- const { q } = useSearchFilterWithUrl();
+ const { q, setQ } = useSearchFilterWithUrl();
  
  const { data, isLoading, isError, error, isFetching, refetch } = useProducts({page, limit, q});
- useEffect(() => {
-  setPage(1);
-}, [q, setPage]); // reset when filters change
+
 
   const total = data?.total;
   const totalPages = useMemo(
@@ -51,6 +49,7 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
 
   const handlePrev = useCallback(() => setPage((s) => Math.max(1, s - 1)), []);
   const handleNext = useCallback(() => setPage((s) => s + 1), []);
+
 
   return {
     page,
@@ -68,5 +67,7 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
     refetch,
     handlePrev,
     handleNext,
+    q,
+    setQ
   } as const;
 }
