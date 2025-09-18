@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../api/products";
 import type { ProductsResponse } from "../api/products";
 
-type UseProductsArgs = { limit?: number; page?: number; q?: string }
+type UseProductsArgs = {page?: number; limit?: number;  q?: string }
 
 export function useProducts({ page = 1, limit = 12, q }: UseProductsArgs) {
     const skip = (page - 1) * limit;

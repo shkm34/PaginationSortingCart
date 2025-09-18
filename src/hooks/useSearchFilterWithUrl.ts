@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 
-
 export function useSearchFilterWithUrl(){
     const getInitialQ = () =>{
         if(typeof window === "undefined") return undefined
@@ -25,6 +24,7 @@ export function useSearchFilterWithUrl(){
         else params.set("q", value)
 
         window.history.replaceState(null, "", url.toString())
+
     }, [])
 
     return {q, setQ}

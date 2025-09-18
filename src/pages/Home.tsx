@@ -10,7 +10,7 @@ export default function Home() {
 
   const {
     page, products, total, totalPages, limit, hasNext,
-    isLoading, isError, error, isFetching, handlePrev, handleNext } = usePaginatedProducts({ initialPage: 1, limit: 12 });
+    isLoading, isError, error, isFetching, handlePrev, handleNext, q, setQ } = usePaginatedProducts({ initialPage: 1, limit: 12 });
 
   if (isLoading) return <LoadingBox message="Loading products…" />;
 
@@ -24,7 +24,7 @@ export default function Home() {
         {isFetching && <span className="ml-2 text-xs"> — updating…</span>}
       </div>
 
-      <SearchFilter />
+      <SearchFilter q={q} setQ={setQ} />
 
       <ProductList products={products} onAdd={(p) => console.log("Add to cart:", p.id)} />
 
