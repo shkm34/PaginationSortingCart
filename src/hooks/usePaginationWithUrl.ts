@@ -15,7 +15,7 @@ export function usePaginationWithUrl(opts?: Opts) {
         paramsLimit = "limit",
         defaultPage = 1,
         defaultLimit = 12,
-        pushHistory = false,
+        pushHistory = true,
     } = opts ?? {};
 
     const readPage = () => (
@@ -60,18 +60,23 @@ export function usePaginationWithUrl(opts?: Opts) {
         
     // keep state updated when URL changes (back/forward navigation, or other changes)
     useEffect(() => {
-         if (typeof window === "undefined") return;
+         if (typeof window === "undefined") {
+            console.debug("[usePagination] window is undefined, skipping popstate listener setup")
+            return};
 
+         console.debug("[usePagination] adding popstate listener")
         const onPopState = () => {
             const p = getIntFromSearch(window.location.search, paramsPage, defaultPage)
             const l = getIntFromSearch(window.location.search, paramsLimit, defaultLimit)
-            setPage(p)
-            setLimit(l)
+            console.debug("[usePagination] popstate handler called, search:", window.location.search)
+            setPage((prev) => (p !== prev ? p : prev))
+            setLimit((prev) => (l !== prev ? l : prev))
         }
 
         window.addEventListener("popstate", onPopState)
         return () => window.removeEventListener("popstate", onPopState)
     }, [paramsPage, paramsLimit, defaultPage, defaultLimit])
+
 
     return{
     page,

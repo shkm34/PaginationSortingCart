@@ -1,8 +1,10 @@
 // src/hooks/usePaginatedProducts.ts
-import { useEffect, useMemo, useCallback} from "react";
+import {useMemo, useCallback} from "react";
 import { useProducts } from "../hooks/useProducts";
 import { usePaginationWithUrl } from "../hooks/usePaginationWithUrl";
 import { useSearchFilterWithUrl } from "./useSearchFilterWithUrl";
+import { useCategory } from "./useCategory";
+import { useQueryOrCategory } from "./useQueryOrCategory";
 
 // Public options you can pass when calling the hook
 export type UsePaginatedProductsOpts = {
@@ -34,9 +36,15 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
     pushHistory,
   });
 
+
+
  const { q, setQ } = useSearchFilterWithUrl();
+ const { category, setCategory } = useCategory();
+  const params = useQueryOrCategory(q, category);
+
+
  
- const { data, isLoading, isError, error, isFetching, refetch } = useProducts({page, limit, q});
+ const { data, isLoading, isError, error, isFetching, refetch } = useProducts({page, limit, ...params});
 
 
   const total = data?.total;
@@ -47,8 +55,21 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
 
   const hasNext = typeof total === "number" ? page < (totalPages ?? 0) : true;
 
-  const handlePrev = useCallback(() => setPage((s) => Math.max(1, s - 1)), []);
-  const handleNext = useCallback(() => setPage((s) => s + 1), []);
+  const handlePrev = useCallback(() => setPage((s) => Math.max(1, s - 1)), [setPage]);
+  const handleNext = useCallback(() => setPage((s) => s + 1), [setPage]);
+
+  const setQWithReset = useCallback((newQ: string) => {
+    setCategory(undefined); // Clear category
+    setQ(newQ);
+  }, [setQ, setCategory]);
+
+
+  // this function is helping to reset the query state when category is set, 
+  // so search input field will be cleared upon render
+  const setCategoryWithReset = useCallback((newCategory: string) => {
+    setQ(""); // Clear query
+    setCategory(newCategory);
+  }, [setQ, setCategory]);
 
 
   return {
@@ -57,6 +78,7 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
     limit,
     data,
     products: data?.products ?? [],
+    categories: data?.categories ?? [],
     total,
     totalPages,
     hasNext,
@@ -68,6 +90,8 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
     handlePrev,
     handleNext,
     q,
-    setQ
+    setQ: setQWithReset,
+    category,
+    setCategory: setCategoryWithReset
   } as const;
 }

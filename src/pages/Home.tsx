@@ -5,12 +5,14 @@ import PaginationButton from "../components/PaginationButton";
 import LoadingBox from "../components/Boxes/LoadingBox";
 import ErrorBox from "../components/Boxes/ErrorBox";
 import SearchFilter from "../components/Filters/SearchFilter";
+import CategoryList from "../components/CategoryList";
 
 export default function Home() {
 
   const {
-    page, products, total, totalPages, limit, hasNext,
-    isLoading, isError, error, isFetching, handlePrev, handleNext, q, setQ } = usePaginatedProducts({ initialPage: 1, limit: 12 });
+    page, products, categories, total, totalPages, limit, hasNext,
+    isLoading, isError, error, isFetching, handlePrev, handleNext, q, setQ, category, setCategory  } = usePaginatedProducts({ initialPage: 1, limit: 12 });
+console.log("Home render:", { category });
 
   if (isLoading) return <LoadingBox message="Loading products…" />;
 
@@ -18,24 +20,44 @@ export default function Home() {
 
   return (
     <>
-      <div className="mb-4">
-        Showing <strong>{(page- 1)*limit + 1}</strong> to <strong>{page * limit}</strong>
-        {typeof total === "number" ? <> of <strong>{total}</strong></> : null}
-        {isFetching && <span className="ml-2 text-xs"> — updating…</span>}
+      <div className="flex gap-6">
+        {/* Left Column */}
+        <div className="w-1/4 bg-white p-4 rounded-2xl shadow-md">
+          <div className="mb-4">
+            <SearchFilter q={q} setQ={setQ} />
+          </div>
+          <div className="space-y-2 max-h-[70vh] overflow-y-auto">
+            <CategoryList categories={categories} category={category} setCategory={setCategory} />
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="flex-1">
+          <div className="mb-4 text-sm text-gray-600">
+            Showing <strong>{(page - 1) * limit + 1}</strong> to <strong>{page * limit}</strong>
+            {typeof total === "number" ? <> of <strong>{total}</strong></> : null}
+            {isFetching && <span className="ml-2 text-xs text-blue-500"> — updating…</span>}
+          </div>
+
+          <ProductList
+            products={products}
+            onAdd={(p) => console.log("Add to cart:", p.id)}
+          />
+
+          <div className="mt-6 flex justify-center">
+            <PaginationButton
+              page={page}
+              totalPages={totalPages}
+              onPrev={handlePrev}
+              onNext={handleNext}
+              isNextDisabled={!hasNext}
+            />
+          </div>
+        </div>
       </div>
 
-      <SearchFilter q={q} setQ={setQ} />
-
-      <ProductList products={products} onAdd={(p) => console.log("Add to cart:", p.id)} />
-
-      <PaginationButton
-        page={page}
-        totalPages={totalPages}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        isNextDisabled={!hasNext}
-      />
     </>
+
   );
 
 }

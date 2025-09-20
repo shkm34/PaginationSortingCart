@@ -14,26 +14,27 @@ export type ProductsResponse = {
   total: number
   skip: number
   limit: number
+  categories?: string[]
 }
 
 export async function fetchProducts(params:FetchProductsParams = {}): Promise<ProductsResponse>{
     const { limit = 12, skip = 0, query, category, signal } = params
 
     let url : URL
+    
     if(query && query.trim().length > 0){
         url = new URL(`${BASE}/products/search`)
         url.searchParams.set("q", query.trim())
     }
     else if(category){
-        url = new URL(`${BASE}/products`)
-        url.searchParams.set("category", category)
+        url = new URL(`${BASE}/products/category/${category}`)
     } else {
           url = new URL(`${BASE}/products`)
     }
     url.searchParams.set("limit", String(limit));
     url.searchParams.set("skip", String(skip));
 
-    const res = await fetch(url.toString(), { signal })
+    const res = await fetch(url.toString(), { signal });
 
     if(!res.ok){
         throw new Error("Failed to fetch products")
@@ -41,10 +42,16 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
 
     const data = await res.json()
 
+    const catRes = await fetch(`${BASE}/products/category-list`)
+    const categories = await catRes.json()
+    
+    
+
     return {
         products: data.products ?? [],
         total: typeof data.total === 'number'? data.total : (data.products?.length ?? 0),
         skip: typeof data.skip === 'number' ? data.skip : skip,
-        limit: typeof data.limit === 'number' ? data.limit : limit
+        limit: typeof data.limit === 'number' ? data.limit : limit,
+        categories: Array.isArray(categories) ? categories : []
     }
 }

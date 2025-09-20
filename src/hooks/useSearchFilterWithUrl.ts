@@ -23,7 +23,7 @@ export function useSearchFilterWithUrl(){
         if(!value) params.delete("q")
         else params.set("q", value)
 
-        window.history.replaceState(null, "", url.toString())
+        window.history.pushState(null, "", url.toString())
 
     }, [])
 
