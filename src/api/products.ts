@@ -1,4 +1,5 @@
 import type { Product } from '../types/types'
+import { fetchSortedProducts } from './fetchSortedProducts'
 
 const BASE = 'https://dummyjson.com'
 
@@ -7,6 +8,7 @@ export type FetchProductsParams = {
     skip?: number
     query?: string
     category?: string
+    sorting?: 'highToLow' | 'lowToHigh'
     signal?: AbortSignal;
 }
 export type ProductsResponse = {
@@ -18,7 +20,7 @@ export type ProductsResponse = {
 }
 
 export async function fetchProducts(params:FetchProductsParams = {}): Promise<ProductsResponse>{
-    const { limit = 12, skip = 0, query, category, signal } = params
+    const { limit = 12, skip = 0, query, category, sorting, signal } = params
 
     let url : URL
     
@@ -40,15 +42,28 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
         throw new Error("Failed to fetch products")
     }
 
-    const data = await res.json()
+    let data: { products?: Product[], total?: number, skip?: number, limit?: number} = {}
+    console.log("Fetched data:", data);
 
+    
+    
+    
+    const sortedData = await fetchSortedProducts({ limit, skip, query, category, sorting, signal });
+    
+    if(sorting){
+        data = sortedData
+    } else {
+        data = await res.json()
+    }
+
+    const productArr = data.products ?? []
+    
     const catRes = await fetch(`${BASE}/products/category-list`)
     const categories = await catRes.json()
-    
-    
+    console.log("After sorting:", sortedData);
 
     return {
-        products: data.products ?? [],
+        products: productArr,
         total: typeof data.total === 'number'? data.total : (data.products?.length ?? 0),
         skip: typeof data.skip === 'number' ? data.skip : skip,
         limit: typeof data.limit === 'number' ? data.limit : limit,
