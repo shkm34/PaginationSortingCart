@@ -6,13 +6,16 @@ import LoadingBox from "../components/Boxes/LoadingBox";
 import ErrorBox from "../components/Boxes/ErrorBox";
 import SearchFilter from "../components/Filters/SearchFilter";
 import CategoryList from "../components/CategoryList";
+import SortingFilter from "../components/Filters/SortingFilter";
 
 export default function Home() {
 
   const {
     page, products, categories, total, totalPages, limit, hasNext,
-    isLoading, isError, error, isFetching, handlePrev, handleNext, q, setQ, category, setCategory  } = usePaginatedProducts({ initialPage: 1, limit: 12 });
-console.log("Home render:", { category });
+    isLoading, isError, error, isFetching, handlePrev, handleNext,
+    q, setQ, category, setCategory, sorting, setSorting, range, setRange
+  } = usePaginatedProducts({ initialPage: 1, limit: 12 });
+  console.log("Home render:", { category });
 
   if (isLoading) return <LoadingBox message="Loading products…" />;
 
@@ -25,6 +28,12 @@ console.log("Home render:", { category });
         <div className="w-1/4 bg-white p-4 rounded-2xl shadow-md">
           <div className="mb-4">
             <SearchFilter q={q} setQ={setQ} />
+            <SortingFilter
+              sorting={sorting}
+              setSorting={setSorting}
+              range={range}
+              setRange={setRange}
+            />
           </div>
           <div className="space-y-2 max-h-[70vh] overflow-y-auto">
             <CategoryList categories={categories} category={category} setCategory={setCategory} />

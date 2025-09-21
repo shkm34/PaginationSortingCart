@@ -1,5 +1,6 @@
 import type { Product } from '../types/types'
 import { fetchSortedProducts } from './fetchSortedProducts'
+import { dollorToRupee } from '../utils/dollorToRupee'
 
 const BASE = 'https://dummyjson.com'
 
@@ -9,6 +10,7 @@ export type FetchProductsParams = {
     query?: string
     category?: string
     sorting?: 'highToLow' | 'lowToHigh'
+    range?: { min: number; max: number };
     signal?: AbortSignal;
 }
 export type ProductsResponse = {
@@ -20,7 +22,7 @@ export type ProductsResponse = {
 }
 
 export async function fetchProducts(params:FetchProductsParams = {}): Promise<ProductsResponse>{
-    const { limit = 12, skip = 0, query, category, sorting, signal } = params
+    const { limit = 12, skip = 0, query, category, sorting, signal, range } = params
 
     let url : URL
     
@@ -44,13 +46,10 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
 
     let data: { products?: Product[], total?: number, skip?: number, limit?: number} = {}
     console.log("Fetched data:", data);
-
     
     
-    
-    const sortedData = await fetchSortedProducts({ limit, skip, query, category, sorting, signal });
-    
-    if(sorting){
+    if(sorting || range){
+        const sortedData = await fetchSortedProducts({ limit, skip, query, category, sorting, range, signal });
         data = sortedData
     } else {
         data = await res.json()
@@ -58,9 +57,9 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
 
     const productArr = data.products ?? []
     
+    
     const catRes = await fetch(`${BASE}/products/category-list`)
     const categories = await catRes.json()
-    console.log("After sorting:", sortedData);
 
     return {
         products: productArr,

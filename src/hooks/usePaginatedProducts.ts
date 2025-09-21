@@ -1,5 +1,5 @@
 // src/hooks/usePaginatedProducts.ts
-import {useMemo, useCallback} from "react";
+import {useMemo, useCallback, useEffect} from "react";
 import { useProducts } from "../hooks/useProducts";
 import { usePaginationWithUrl } from "../hooks/usePaginationWithUrl";
 import { useSearchFilterWithUrl } from "./useSearchFilterWithUrl";
@@ -39,12 +39,16 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
 
 
  const { q, setQ } = useSearchFilterWithUrl();
- const { category, setCategory } = useCategory();
-  const params = useQueryOrCategory(q, category);
+ const { category, setCategory, sorting, setSorting, range, setRange } = useCategory();
+ const params = useQueryOrCategory(q, category);
+
+ useEffect(() => {
+    setPage(1); // Reset to first page on sorting or range change
+ }, [category, sorting, range, setPage]);
 
 
  
- const { data, isLoading, isError, error, isFetching, refetch } = useProducts({page, limit, ...params});
+ const { data, isLoading, isError, error, isFetching, refetch } = useProducts({page, limit, ...params, sorting, range});
 
 
   const total = data?.total;
@@ -92,6 +96,10 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
     q,
     setQ: setQWithReset,
     category,
-    setCategory: setCategoryWithReset
+    setCategory: setCategoryWithReset,
+    sorting,
+    setSorting,
+    range,
+    setRange
   } as const;
 }
