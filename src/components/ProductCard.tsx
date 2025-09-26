@@ -1,5 +1,6 @@
 
 import type { Product } from '../types/types'
+import { useNavigate} from "react-router-dom";
 
 type props = {
     product: Product
@@ -8,8 +9,14 @@ type props = {
 }
 
 function ProductCard({ product, onAdd, loading }: props) {
+    const navigate = useNavigate();
+
+    const handleOpenProductPage = (product: Product) => {
+         navigate(`/product/${product.id}`, { state: { product} })
+    };
+
     return (
-        <div className="bg-white text-gray-900 shadow-md hover:shadow-xl transition-shadow rounded-2xl overflow-hidden flex flex-col border border-gray-200">
+        <div onClick={() => handleOpenProductPage(product)} className="bg-white text-gray-900 shadow-md hover:shadow-xl transition-shadow rounded-2xl overflow-hidden flex flex-col border border-gray-200">
             {/* Image */}
             {product.thumbnail ? (
                 <img

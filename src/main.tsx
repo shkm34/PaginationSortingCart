@@ -1,11 +1,13 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import ProductPage from "./components/ProductPage";
+import { fetchProductById } from "./api/fetchProductById";
 
-const queryClient = new QueryClient(
-  {
+const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // keep data fresh-ish but avoid constant refetch on focus
@@ -14,13 +16,26 @@ const queryClient = new QueryClient(
       retry: 1,
     },
   },
-}
-);
+});
 
-createRoot(document.getElementById('root')!).render(
-  
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />, // App should render <Outlet />
+  },
+  {
+    path: "product/:id",
+    element: <ProductPage />,
+    loader: async ({ params }) => {
+      return await fetchProductById(Number(params.id));
+    },
+  },
+]);
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <RouterProvider router={router} />
     </QueryClientProvider>
-  
-)
+  </StrictMode>
+);

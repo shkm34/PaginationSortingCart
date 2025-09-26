@@ -56,7 +56,7 @@ export async function fetchProducts(params:FetchProductsParams = {}): Promise<Pr
     }
 
     const productArr = data.products ?? []
-    
+    console.log("Fetched products:", productArr);
     
     const catRes = await fetch(`${BASE}/products/category-list`)
     const categories = await catRes.json()
