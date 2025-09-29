@@ -1,6 +1,7 @@
 
 import type { Product } from '../types/types'
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useCart } from '../context/CartContext';
 
 type props = {
     product: Product
@@ -8,11 +9,13 @@ type props = {
     loading?: boolean
 }
 
-function ProductCard({ product, onAdd, loading }: props) {
+function ProductCard({ product, loading }: props) {
     const navigate = useNavigate();
+    const { addToCart } = useCart();
+
 
     const handleOpenProductPage = (product: Product) => {
-         navigate(`/product/${product.id}`, { state: { product} })
+        navigate(`/product/${product.id}`, { state: { product } })
     };
 
     return (
@@ -48,7 +51,10 @@ function ProductCard({ product, onAdd, loading }: props) {
                     ${product.price}
                 </span>
                 <button
-                    onClick={() => onAdd?.(product)}
+                    onClick={(e) => {
+                        e.stopPropagation(); // important if the card itself is clickable/link-wrapped
+                        addToCart(product);
+                    }}
                     disabled={loading}
                     className="ml-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >

@@ -1,126 +1,80 @@
-// SearchFilter.tsx (replace component body with this)
-import React, { useEffect, useRef } from "react";
-import { useSearchInput } from "../../hooks/useSearchInput";
-import{ useDebounce} from "../../hooks/useDebounce"; // default import
-// NOTE: SearchFilter now receives q and setQ as props from parent
-function SearchFilter({ q, setQ }: { q?: string; setQ: (v?: string) => void }) {
-  const { input, setInput } = useSearchInput();
-  const debouncedInput = useDebounce(input, 1500);
+// src/context/CartContext.tsx
+import { createContext, use, useMemo, useReducer, useCallback, type ReactNode } from "react";
+import cartReducer, { initialCartState } from "../reducers/cartReducer";
+import type { CartState, CartAction, Product, CartItem } from "../types";
 
-  // keep a ref of the last value we asked setQ to set
-  const lastSetQRef = useRef<string | undefined>(undefined);
+type CartContextValue = {
+  state: CartState;
+  // helpers
+  addToCart: (product: Product, quantity?: number) => void;
+  removeFromCart: (productId: number) => void;
+  setQuantity: (productId: number, quantity: number) => void;
+  clearCart: () => void;
+  // derived selectors
+  totalItems: number;
+  subtotal: number;
+};
 
-  const mountedRef = useRef(false);
+// keep the undefined default so consumers fail fast when used outside provider
+const CartContext = createContext<CartContextValue | undefined>(undefined);
 
-  // 1) Seed the input when parent `q` changes (only when q is defined and differs)
-// Replace previous seeding effect with this:
-useEffect(() => {
-  // Seed only once on mount (if there's an initial q in URL/state)
-  if (!mountedRef.current) {
-    mountedRef.current = true;
-    if (typeof q !== "undefined" && q !== "") {
-      setInput(q);
-    }
-  }
-}, [q, setInput]);
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(cartReducer, initialCartState);
 
-// 2) Only call setQ when the debounced value actually differs from current canonical q.
-useEffect(() => {
-  const normalized = (debouncedInput ?? "").trim();
-  const normalizedOrUndefined = normalized === "" ? undefined : normalized;
+  // action helpers - stable references with useCallback
+  const addToCart = useCallback((product: Product, quantity = 1) => {
+    dispatch({ type: "ADD", payload: { product, quantity } });
+  }, []);
 
-  console.log("[SearchFilter] effect -> debouncedInput:", JSON.stringify(debouncedInput));
-  console.log("[SearchFilter] effect -> normalized:", normalizedOrUndefined, "prop q:", q);
+  const removeFromCart = useCallback((productId: number) => {
+    dispatch({ type: "REMOVE", payload: { productId } });
+  }, []);
 
-  // If it's identical to current canonical q, don't call setQ (avoid redundant updates)
-  if (normalizedOrUndefined === q) {
-    // update lastSetQRef to reflect that we are in-sync
-    lastSetQRef.current = normalizedOrUndefined;
-    return;
-  }
+  const setQuantity = useCallback((productId: number, quantity: number) => {
+    dispatch({ type: "SET_QTY", payload: { productId, quantity } });
+  }, []);
 
-  // Optional safety: if we recently called setQ with this value, skip
-  if (lastSetQRef.current === normalizedOrUndefined) return;
+  const clearCart = useCallback(() => {
+    dispatch({ type: "CLEAR" });
+  }, []);
 
-  // call setQ and remember that we called it
-  lastSetQRef.current = normalizedOrUndefined;
-  console.log("[SearchFilter] calling setQ with:", normalizedOrUndefined);
-  setQ(normalizedOrUndefined);
-}, [debouncedInput, q, setQ]);
+  // derived values: memoized
+  const { totalItems, subtotal } = useMemo(() => {
+    return state.items.reduce(
+      (acc, it) => {
+        acc.totalItems += it.quantity;
+        acc.subtotal += it.quantity * it.price;
+        return acc;
+      },
+      { totalItems: 0, subtotal: 0 }
+    );
+  }, [state.items]);
 
-return (
-  <div>
-    <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-      Search products
-    </label>
+  // memoize value object so provider doesn't cause unnecessary re-renders
+  const value = useMemo<CartContextValue>(
+    () => ({
+      state,
+      addToCart,
+      removeFromCart,
+      setQuantity,
+      clearCart,
+      totalItems,
+      subtotal,
+    }),
+    // note: state is included because consumers may need any part of it;
+    // if you only expose derived values and stable helpers, you can narrow deps further.
+    [state, addToCart, removeFromCart, setQuantity, clearCart, totalItems, subtotal]
+  );
 
-    <input
-      id="search"
-      type="search"
-      value={input}
-      onChange={(e) => setInput(e.target.value)}
-      placeholder="Search by title or description..."
-      className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-      autoComplete="off"
-    />
-    <p className="mt-2 text-xs text-gray-500">Typing is debounced (400ms) to avoid extra requests.</p>
-  </div>
-);
+  // React 19: render the context object directly as a provider
+  return <CartContext value={value}>{children}</CartContext>;
 }
 
-export default SearchFilter;
-
-
-import { useSearchInput } from "../../hooks/useSearchInput"
-import { useDebounce } from "../../hooks/useDebounce";
-import { useEffect, useRef } from "react";
-
-function SearchFilter({q, setQ} : {q?: string; setQ: (q?: string) => void}) {
-    const { input, setInput } = useSearchInput();
-    const debouncedInput = useDebounce(input, 1500);
-
-   console.log("[SearchFilter] render -> input:", JSON.stringify(input), "prop q:", q);
-
-const mountedRef = useRef(false);
-
-  // 1) Seed the input when parent `q` changes (only when q is defined and differs)
-// Replace previous seeding effect with this:
-useEffect(() => {
-  // Seed only once on mount (if there's an initial q in URL/state)
-  if (!mountedRef.current) {
-    mountedRef.current = true;
-    if (typeof q !== "undefined" && q !== "") {
-      setInput(q);
-    }
+// hook for components (React 19: use() can read context)
+export function useCart() {
+  const ctx = use(CartContext);
+  if (!ctx) {
+    throw new Error("useCart must be used within a CartProvider");
   }
-}, [q, setInput]);
-
-    useEffect(() =>{
-         console.log("[SearchFilter] effect -> debouncedInput:", JSON.stringify(debouncedInput));
-        const val = debouncedInput.trim()
-         console.log("[SearchFilter] calling setQ with:", val === "" ? undefined : val);
-        setQ(val === "" ? undefined : val)
-    }, [debouncedInput, setQ])
-
-    return (
-        <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-                Search products
-            </label>
-
-            <input
-                id="search"
-                type="search"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Search by title or description..."
-                className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                autoComplete="off"
-            />
-            <p className="mt-2 text-xs text-gray-500">Typing is debounced (400ms) to avoid extra requests.</p>
-        
-    </div>
-  )
+  return ctx;
 }
-
-export default SearchFilter

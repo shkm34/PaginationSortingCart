@@ -15,7 +15,6 @@ export default function Home() {
     isLoading, isError, error, isFetching, handlePrev, handleNext,
     q, setQ, category, setCategory, sorting, setSorting, range, setRange
   } = usePaginatedProducts({ initialPage: 1, limit: 12 });
-  console.log("Home render:", { category });
 
   if (isLoading) return <LoadingBox message="Loading products…" />;
 
@@ -50,7 +49,6 @@ export default function Home() {
 
           <ProductList
             products={products}
-            onAdd={(p) => console.log("Add to cart:", p.id)}
           />
 
           <div className="mt-6 flex justify-center">

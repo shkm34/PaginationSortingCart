@@ -14,7 +14,6 @@ type Props = {
 export default function ProductPage({ onAdd }: Props) {
   const [quantity, setQuantity] = useState<number>(1);
   const product = useLoaderData() as ProductDetailed;
-  console.log("Loaded product:", product);
 
   const handleAdd = () => {
     if (product.stock !== undefined && quantity > product.stock) {
