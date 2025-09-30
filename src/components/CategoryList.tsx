@@ -2,7 +2,7 @@
 type props = {
     categories: string[];
     category: string | undefined;
-    setCategory: (category: string | undefined) => void;
+    setCategory: (category: string) => void;
 }
 function CategoryList({ categories, category, setCategory }: props) {
   

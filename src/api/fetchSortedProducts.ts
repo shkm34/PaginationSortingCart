@@ -19,7 +19,6 @@ export async function fetchSortedProducts(params:FetchProductsParams = {}) {
           url = new URL(`${BASE}/products?limit=194`)
     }
 
-    console.log("horahhai", url.toString());
 
     const res = await fetch(url.toString(), { signal });
 

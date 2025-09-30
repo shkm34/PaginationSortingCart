@@ -2,7 +2,7 @@ import { useSyncedSearchFilter } from "../../hooks/useSyncedSearchFilter"; // de
 
 //SearchFilter now receives q and setQ as props from parent
 
-function SearchFilter({ q, setQ }: { q?: string; setQ: (v?: string) => void }) {
+function SearchFilter({ q, setQ }: { q?: string; setQ: (v: string) => void }) {
 
     const { input, setInput } = useSyncedSearchFilter(q, setQ, 400);
 

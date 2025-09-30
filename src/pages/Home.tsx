@@ -14,7 +14,7 @@ export default function Home() {
     page, products, categories, total, totalPages, limit, hasNext,
     isLoading, isError, error, isFetching, handlePrev, handleNext,
     q, setQ, category, setCategory, sorting, setSorting, range, setRange
-  } = usePaginatedProducts({ initialPage: 1, limit: 12 });
+  } = usePaginatedProducts({ initialPage: 1});
 
   if (isLoading) return <LoadingBox message="Loading products…" />;
 
@@ -24,7 +24,7 @@ export default function Home() {
     <>
       <div className="flex gap-6">
         {/* Left Column */}
-        <div className="w-1/4 bg-white p-4 rounded-2xl shadow-md">
+        <div className="w-1/4 bg-white text-black p-4 rounded-2xl shadow-md">
           <div className="mb-4">
             <SearchFilter q={q} setQ={setQ} />
             <SortingFilter

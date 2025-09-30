@@ -51,7 +51,6 @@ export default function CartProvider({children}: { children: ReactNode }) {
         return totals;
     }, [state.items]);
 
-    console.log(state);
 
     const value = useMemo<CartContextValue>(() => ({
         state, addToCart, removeFromCart, setQuantity,

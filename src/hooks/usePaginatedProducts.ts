@@ -17,7 +17,7 @@ export type UsePaginatedProductsOpts = {
 };
 
 export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
-
+console.log("usePaginatedProducts")
  const {
     initialPage = 1,
     initialLimit = 12,
@@ -63,6 +63,7 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
   const handleNext = useCallback(() => setPage((s) => s + 1), [setPage]);
 
   const setQWithReset = useCallback((newQ: string) => {
+    //console.log("newQ")
     setCategory(undefined); // Clear category
     setQ(newQ);
   }, [setQ, setCategory]);
@@ -71,7 +72,8 @@ export function usePaginatedProducts(opts: UsePaginatedProductsOpts = {}) {
   // this function is helping to reset the query state when category is set, 
   // so search input field will be cleared upon render
   const setCategoryWithReset = useCallback((newCategory: string) => {
-    setQ(""); // Clear query
+    setQ(undefined); // Clear query
+    //console.log("newCategory")
     setCategory(newCategory);
   }, [setQ, setCategory]);
 

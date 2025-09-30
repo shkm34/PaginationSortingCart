@@ -7,7 +7,8 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import ProductPage from "./components/ProductPage";
 import { fetchProductById } from "./api/fetchProductById";
 import CartProvider from "./context/CartContext";
-import Cart from "./components/Cart.tsx";
+import Cart from "./components/Cart/Cart.tsx";
+import RootLayout from "./layouts/RootLayout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,18 +24,24 @@ const queryClient = new QueryClient({
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // App should render <Outlet />
-  },
-  {
-    path: "product/:id",
-    element: <ProductPage />,
-    loader: async ({ params }) => {
-      return await fetchProductById(Number(params.id));
-    },
-  },
-  {
-    path: "/cart",
-    element: <Cart/>, 
+    element: <RootLayout />, 
+    children: [
+
+      { index: true, element: <App /> }, 
+
+      {
+        path: "product/:id",
+        element: <ProductPage />,
+        loader: async ({ params }) => {
+          return await fetchProductById(Number(params.id));
+        },
+      },
+      
+      {
+        path: "cart",
+        element: <Cart />,
+      },
+    ],
   },
 ]);
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 export function useSearchFilterWithUrl(){
+    console.log("useSearchFilterWithUrl")
     const getInitialQ = () =>{
         if(typeof window === "undefined") return undefined
 

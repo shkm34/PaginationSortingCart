@@ -5,8 +5,8 @@ import { useDebounce } from "../hooks/useDebounce"; // default import
 
 //SearchFilter now receives q and setQ as props from parent
 
-export function useSyncedSearchFilter(q: string | undefined, setQ: (v?: string | undefined) => void, debounceMs = 500) {
-
+export function useSyncedSearchFilter(q: string | undefined, setQ: (v: string) => void, debounceMs = 500) {
+console.log("useSyncedSearchFilter")
     const { input, setInput } = useSearchInput();
     const debouncedInput = useDebounce(input, debounceMs);
 
@@ -28,11 +28,15 @@ export function useSyncedSearchFilter(q: string | undefined, setQ: (v?: string |
 
     // 2) Only call setQ when the debounced value actually differs from current canonical q.
     useEffect(() => {
+        //console.log("ho rah hai")
         const normalized = (debouncedInput ?? "").trim();
+         //console.log("q", q,"lastSetQRef.current", lastSetQRef.current)
+        //if(normalized === undefined) return
         const normalizedOrUndefined = normalized === "" ? undefined : normalized;
 
         // If it's identical to current canonical q, don't call setQ (avoid redundant updates)
         if (normalizedOrUndefined === q) {
+
             // update lastSetQRef to reflect that we are in-sync
             lastSetQRef.current = normalizedOrUndefined;
             return;
@@ -44,6 +48,7 @@ export function useSyncedSearchFilter(q: string | undefined, setQ: (v?: string |
         // call setQ and remember that we called it
         lastSetQRef.current = normalizedOrUndefined;
         setQ(normalizedOrUndefined);
+        //console.log("last wala")
     }, [debouncedInput, q, setQ]);
 
     return { input, setInput };

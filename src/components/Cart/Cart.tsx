@@ -1,4 +1,4 @@
-import { useCart } from "../context/CartContext";
+import { useCart } from "../../context/CartContext";
 
 function Cart() {
   const {
@@ -131,7 +131,7 @@ function Cart() {
                 </button>
               </div>
 
-              <div className="mt-4 text-xs text-gray-400">
+              <div className="mt-4 text-xs text-black">
                 Prices include taxes where applicable.
               </div>
             </div>
