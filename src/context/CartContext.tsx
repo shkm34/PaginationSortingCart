@@ -1,6 +1,7 @@
-import { createContext, useContext, useReducer, useMemo, useCallback, type ReactNode } from "react";
+import { createContext, useEffect, useContext, useReducer, useMemo, useCallback, type ReactNode } from "react";
 import type { CartState, CartAction, Product, CartItem } from "../types/types";
 import cartReducer, { initialCartState } from "../reducers/cartReducer";
+import { CART_STORAGE_KEY, loadCart, saveCart } from "../utils/cartStorage";
 
 export type CartContextValue = {
     state: CartState
@@ -18,7 +19,8 @@ export const CartContext = createContext<CartContextValue | undefined>(undefined
 export default function CartProvider({children}: { children: ReactNode }) {
    const [state, dispatch] = useReducer(
     cartReducer,
-    initialCartState
+    initialCartState,
+    () => loadCart(initialCartState)
   );
 
     // helper functions
@@ -50,6 +52,10 @@ export default function CartProvider({children}: { children: ReactNode }) {
         );
         return totals;
     }, [state.items]);
+
+    useEffect(() => {
+        saveCart(state);
+    }, [state]);
 
 
     const value = useMemo<CartContextValue>(() => ({

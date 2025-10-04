@@ -8,6 +8,7 @@ function CategoryList({ categories, category, setCategory }: props) {
   
   return (
      <div className="space-y-2">
+      <div className="text-sm font-medium text-gray-700">Search by category</div>
       {categories.map((cat) => (
         <label
           key={cat}

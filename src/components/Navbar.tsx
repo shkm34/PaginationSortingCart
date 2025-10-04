@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
-export default function MinimalNavbar({ logo = "Shop"}) {
+export default function MinimalNavbar() {
   
   const navigate = useNavigate();
   const onCartClick = () => navigate("/cart");
+  const onHomeClick = () => navigate("/");
 
   const {totalItems} = useCart();
 
@@ -13,13 +14,7 @@ export default function MinimalNavbar({ logo = "Shop"}) {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left: Logo */}
         <div className="flex items-center gap-3">
-          <a
-            href="#"
-            className="inline-flex items-center text-lg font-bold tracking-tight"
-          >
-            <span className="sr-only">Home</span>
-            <span>{logo}</span>
-          </a>
+            <button onClick={onHomeClick} className="text-2xl font-bold hover:bg-gray-100">Home</button>
         </div>
 
         {/* Right: Cart */}

@@ -1,7 +1,7 @@
 
 import type { Product } from '../types/types'
 import { useNavigate } from "react-router-dom";
-import { useCart } from '../context/CartContext';
+import AddButtonOrQuantity from "./Buttons/AddButtonOrQuantity";
 
 type props = {
     product: Product
@@ -11,7 +11,6 @@ type props = {
 
 function ProductCard({ product, loading }: props) {
     const navigate = useNavigate();
-    const { addToCart } = useCart();
 
 
     const handleOpenProductPage = (product: Product) => {
@@ -46,20 +45,11 @@ function ProductCard({ product, loading }: props) {
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-3 mt-auto flex items-center justify-between border-t border-gray-100 bg-gray-50">
+            <div className="px-2 py-3 mt-auto flex items-center justify-around gap-2 border-t border-gray-100 bg-gray-50">
                 <span className="text-lg font-bold text-blue-600">
                     ${product.price}
                 </span>
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation(); // important if the card itself is clickable/link-wrapped
-                        addToCart(product);
-                    }}
-                    disabled={loading}
-                    className="ml-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {loading ? "Adding..." : "Add to Cart"}
-                </button>
+                <AddButtonOrQuantity product={product} />
             </div>
         </div>
 
