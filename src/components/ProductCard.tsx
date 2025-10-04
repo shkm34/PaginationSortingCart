@@ -5,11 +5,9 @@ import AddButtonOrQuantity from "./Buttons/AddButtonOrQuantity";
 
 type props = {
     product: Product
-    onAdd?: (product: Product) => void
-    loading?: boolean
 }
 
-function ProductCard({ product, loading }: props) {
+function ProductCard({ product}: props) {
     const navigate = useNavigate();
 
 
